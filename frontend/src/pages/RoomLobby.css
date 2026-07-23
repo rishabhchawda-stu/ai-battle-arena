@@ -1,0 +1,67 @@
+.lobby-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 20px;
+}
+
+.lobby-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 35px;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.lobby-card h2 {
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+
+.room-code-display {
+  color: #a0a0c0;
+  margin-bottom: 25px;
+}
+
+.room-code-display span {
+  color: #e94560;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+
+.players-list {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.players-list h4 {
+  color: #ffffff;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.player-item {
+  color: #d0d0e0;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.player-item:last-child {
+  border-bottom: none;
+}
+
+.waiting-text {
+  color: #a0a0c0;
+  font-size: 14px;
+  margin-bottom: 20px;
+  font-style: italic;
+}

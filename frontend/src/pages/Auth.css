@@ -1,0 +1,116 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 20px;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 40px 35px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.auth-title {
+  color: #ffffff;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.auth-subtitle {
+  color: #a0a0c0;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.auth-card .form-label {
+  color: #d0d0e0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.auth-card .form-control {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.auth-card .form-control:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #e94560;
+  box-shadow: 0 0 0 0.2rem rgba(233, 69, 96, 0.25);
+  color: #ffffff;
+}
+
+.auth-card .form-control::placeholder {
+  color: #8888a0;
+}
+
+.auth-btn {
+  background: #e94560;
+  border: none;
+  padding: 10px;
+  font-weight: 600;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.auth-btn:hover {
+  background: #d13650;
+}
+
+.auth-btn:disabled {
+  background: #8a2f3d;
+}
+
+.auth-footer {
+  text-align: center;
+  color: #a0a0c0;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: #e94560;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.auth-card {
+  animation: cardPop 0.3s ease;
+}
+
+@keyframes cardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.auth-title {
+  background: linear-gradient(90deg, #e94560, #ff8c69);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
