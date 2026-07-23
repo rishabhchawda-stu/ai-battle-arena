@@ -6,18 +6,22 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const roomRoutes = require("./routes/roomRoutes");
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const Match = require("./models/Match");
 const User = require("./models/User");
 const Room = require("./models/Room");
-const leaderboardRoutes = require("./routes/leaderboardRoutes");
-const adminRoutes = require("./routes/adminRoutes");
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-app.use(cors());
+const FRONTEND_URL = "https://ai-battle-arena-smoky.vercel.app";
+
+app.use(cors({
+  origin: FRONTEND_URL,
+}));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
@@ -33,7 +37,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: FRONTEND_URL,
   },
 });
 
@@ -42,12 +46,11 @@ app.set("io", io);
 // { roomCode: { playerId: { username, userId, x, y, health, kills, isBot } } }
 const battleRooms = {};
 const matchStartTimes = {};
-// { roomCode: intervalId } - AI loop timers
 const aiIntervals = {};
 
 const ARENA_BOUNDS = { minX: 40, maxX: 760, minY: 40, maxY: 580 };
 
-//  AI Bot Logic 
+// ----- AI Bot Logic -----
 const runBotAI = (roomCode) => {
   const room = battleRooms[roomCode];
   if (!room) return;
@@ -55,7 +58,6 @@ const runBotAI = (roomCode) => {
   Object.entries(room).forEach(([botId, botData]) => {
     if (!botData.isBot || botData.health <= 0) return;
 
-    // Find nearest alive human/other player
     let nearestId = null;
     let nearestDist = Infinity;
 
@@ -75,13 +77,11 @@ const runBotAI = (roomCode) => {
     const dy = target.y - botData.y;
     const angle = Math.atan2(dy, dx);
 
-    // Move towards target if far away, else hold position
     const moveSpeed = 3;
     if (nearestDist > 150) {
       botData.x += Math.cos(angle) * moveSpeed;
       botData.y += Math.sin(angle) * moveSpeed;
 
-      // Keep inside arena bounds
       botData.x = Math.max(ARENA_BOUNDS.minX, Math.min(ARENA_BOUNDS.maxX, botData.x));
       botData.y = Math.max(ARENA_BOUNDS.minY, Math.min(ARENA_BOUNDS.maxY, botData.y));
 
@@ -92,7 +92,6 @@ const runBotAI = (roomCode) => {
       });
     }
 
-    // Shoot if within range (30% chance per tick to avoid spamming)
     if (nearestDist < 300 && Math.random() < 0.3) {
       io.to(`battle-${roomCode}`).emit("bulletFired", {
         socketId: botId,
@@ -101,7 +100,6 @@ const runBotAI = (roomCode) => {
         angle,
       });
 
-      // Simple hit chance simulation - closer = more likely to hit
       const hitChance = nearestDist < 100 ? 0.5 : 0.2;
       if (Math.random() < hitChance) {
         target.health = Math.max(0, target.health - 10);
@@ -137,7 +135,6 @@ const checkForWinner = async (roomCode) => {
 
   if (allPlayers.length < 2 || alivePlayers.length > 1) return;
 
-  // Stop the AI loop for this room
   if (aiIntervals[roomCode]) {
     clearInterval(aiIntervals[roomCode]);
     delete aiIntervals[roomCode];
@@ -147,7 +144,6 @@ const checkForWinner = async (roomCode) => {
   const winnerSocketId = winnerEntry ? winnerEntry[0] : null;
   const winnerData = winnerEntry ? winnerEntry[1] : null;
 
-  // Only real (non-bot) players get saved to DB stats
   const humanPlayersResult = allPlayers
     .filter(([, data]) => !data.isBot)
     .map(([socketId, data]) => ({
@@ -245,7 +241,6 @@ io.on("connection", (socket) => {
       battleRooms[roomCode] = {};
       matchStartTimes[roomCode] = Date.now();
 
-      // Spawn any bots that are in this room (only done once, by first joiner)
       const roomDoc = await Room.findOne({ roomCode });
       if (roomDoc) {
         roomDoc.players.forEach((p, index) => {
@@ -264,7 +259,6 @@ io.on("connection", (socket) => {
         });
       }
 
-      // Start the AI loop for this room (runs ~10 times per second)
       aiIntervals[roomCode] = setInterval(() => runBotAI(roomCode), 100);
     }
 
@@ -359,7 +353,6 @@ io.on("connection", (socket) => {
       if (battleRooms[roomCode]) {
         delete battleRooms[roomCode][socket.id];
 
-        // Only clean up if no REAL (non-bot) players remain
         const remainingHumans = Object.values(battleRooms[roomCode]).filter(
           (p) => !p.isBot
         );
